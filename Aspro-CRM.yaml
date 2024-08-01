@@ -1,0 +1,81 @@
+openapi: 3.0.2
+
+info:
+  version: 1.0.0
+  title: Aspro CRM Integration
+  description: Интеграция с Aspro CRM для звонков
+
+servers:
+  - url: 	'some-url'
+
+paths:
+  /subscribe:
+    post:
+      operationId: subscribe
+      summary: Подписаться на события
+      tags:
+        - tomoru/subscribe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tomoruCallbackUrl:
+                  type: string
+              required:
+                - tomoruCallbackUrl
+      responses:
+        200:
+          description: Все ок
+      callbacks:
+        # При отправке этого события в поле `event` POST-запроса должно быть 'getPhoneData'
+        getPhoneData:
+          '{$request.body#/tomoruCallbackUrl}':
+            post:
+              summary: Прозвон клиентов
+              description: Прозвон клиентов
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      allOf:
+                        - $ref: 'https://api.tomoru.ru/openapi#/components/schemas/TomoruEvent'
+                        - type: object
+                          properties:
+                            data:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: Имя клиента
+                                  example: Иван
+                              required:
+                                - name
+                            
+              responses:
+                200:
+                  description: Все ок
+  /config-updated:
+    post:
+      operationId: configUpdated
+      summary: Обновление конфига
+      tags:
+        - tomoru/config_updated
+        - tomoru/bot_connected
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config:
+                  $ref: https://api.tomoru.ru/openapi#/components/schemas/TomoruConfig
+                botId:
+                  $ref: https://api.tomoru.ru/openapi#/components/schemas/botId
+              required:
+                - config
+                - botId
+      responses:
+        200:
+          description: Все ок
