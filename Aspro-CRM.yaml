@@ -50,8 +50,13 @@ paths:
                                   type: string
                                   description: Имя клиента
                                   example: Иван
+                                lead_id:
+                                  type: string
+                                  description: ID сделки
+                                  example: 123
                               required:
                                 - name
+                                - lead_id
                             
               responses:
                 200:
