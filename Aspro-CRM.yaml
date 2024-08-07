@@ -6,9 +6,48 @@ info:
   description: Интеграция с Aspro CRM для звонков
 
 servers:
-  - url: 	'some-url'
+  - url: 		'some-url'
 
 paths:
+  /update:
+    post:
+      operationId: sendDataAction
+      summary: Отправить данные
+      description: Действие отправки данных на сервер через POST запрос
+      tags:
+        - tomoru/call
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID пользователя
+                message:
+                  type: string
+                  description: Сообщение для отправки
+              required:
+                - userId
+                - message
+      responses:
+        200:
+          description: Данные успешно отправлены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Статус выполнения
+        400:
+          description: Неверный запрос
+        500:
+          description: Ошибка сервера
+
+
   /subscribe:
     post:
       operationId: subscribe
@@ -49,11 +88,9 @@ paths:
                                 name:
                                   type: string
                                   description: Имя клиента
-                                  example: Иван
                                 lead_id:
                                   type: string
                                   description: ID сделки
-                                  example: 123
                               required:
                                 - name
                                 - lead_id
