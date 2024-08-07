@@ -12,8 +12,8 @@ paths:
   /update:
     post:
       operationId: sendDataAction
-      summary: Отправить данные
-      description: Действие отправки данных на сервер через POST запрос
+      summary: Обновить данные
+      description: Действие обновления данных в CRM системе через POST запрос
       tags:
         - tomoru/call
       requestBody:
@@ -22,15 +22,48 @@ paths:
             schema:
               type: object
               properties:
-                userId:
+                leadID:
                   type: string
-                  description: ID пользователя
-                message:
+                  description: ID лида
+                ActivityType:
                   type: string
-                  description: Сообщение для отправки
+                  description: Сфера деятельности
+                  example: "Информационные технологии"
+                IP-telephony:
+                  type: string
+                  description: IP-телефония
+                  example: "Cisco"
+                CRM:
+                  type: string
+                  description: CRM система
+                  example: "Salesforce"
+                CompanyHeadquarters:
+                  type: string
+                  description: Штаб компании
+                  example: "Москва, Россия"
+                NumberOfEmployees:
+                  type: integer
+                  description: Сколько человек
+                  example: 500
+                CompanyProducts:
+                  type: string
+                  description: Продукты компании
+                  example: "Программное обеспечение, Консалтинг"
+                AverageCheck:
+                  type: number
+                  format: float
+                  description: Средний чек
+                  example: 12000.50
+                DealProduct:
+                  type: string
+                  description: Продукт сделки
+                  example: "Корпоративное решение"
+                InterestedIn:
+                  type: string
+                  description: Интересуется
+                  example: "Новыми технологиями, Облачные сервисы"
               required:
-                - userId
-                - message
+                - leadID
       responses:
         200:
           description: Данные успешно отправлены
@@ -46,7 +79,44 @@ paths:
           description: Неверный запрос
         500:
           description: Ошибка сервера
-
+  
+  /move:
+    post:
+      operationId: MoveDataAction
+      summary: Перемещение лида по воронке
+      description: Действие перемещения данных в CRM системе через POST запрос
+      tags:
+        - tomoru/call
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                leadID:
+                  type: string
+                  description: ID лида
+                pipelineID:
+                  type: string
+                  description: ID воронки
+              required:
+                - leadID
+                - pipelineID
+      responses:
+        200:
+          description: Данные успешно отправлены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Статус выполнения
+        400:
+          description: Неверный запрос
+        500:
+          description: Ошибка сервера
 
   /subscribe:
     post:
@@ -68,8 +138,7 @@ paths:
         200:
           description: Все ок
       callbacks:
-        # При отправке этого события в поле `event` POST-запроса должно быть 'getPhoneData'
-        getPhoneData:
+        MakeACall:
           '{$request.body#/tomoruCallbackUrl}':
             post:
               summary: Прозвон клиентов
@@ -85,12 +154,13 @@ paths:
                             data:
                               type: object
                               properties:
-                                name:
+                                field:
                                   type: string
                                   description: Имя клиента
                                 lead_id:
                                   type: string
                                   description: ID сделки
+                                  example: 123
                               required:
                                 - name
                                 - lead_id
